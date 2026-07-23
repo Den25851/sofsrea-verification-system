@@ -10,28 +10,33 @@ class MemberController extends Controller
     /**
      * Display all members.
      */
- public function index(Request $request)
-{
-    $search = $request->search;
+    public function index(Request $request)
+    {
+        $search = $request->search;
 
- $members = Member::when($search, function ($query) use ($search) {
+        $members = Member::when($search, function ($query) use ($search) {
+                $query->where('member_number', 'like', "%{$search}%");
+            })
+            ->orderBy('member_number', 'asc')
+            ->paginate(10);
 
-        $query->where('member_number', 'like', "%{$search}%");
-
-    })
-    ->latest()
-    ->paginate(10)
-    ->withQueryString();
-
- return view('members.index', compact('members', 'search'));
-}
+        return view('members.index', compact('members', 'search'));
+    }
 
     /**
-     * Show the form for creating a member.
+     * Show the form for creating a new member.
      */
     public function create()
     {
-        return view('members.create');
+        $lastMember = Member::orderBy('member_number', 'desc')->first();
+
+        if ($lastMember) {
+            $nextNumber = str_pad(((int) $lastMember->member_number) + 1, 4, '0', STR_PAD_LEFT);
+        } else {
+            $nextNumber = '0001';
+        }
+
+        return view('members.create', compact('nextNumber'));
     }
 
     /**
@@ -39,23 +44,31 @@ class MemberController extends Controller
      */
     public function store(Request $request)
     {
+        // Generate the next member number automatically
+        $lastMember = Member::orderBy('member_number', 'desc')->first();
+
+        if ($lastMember) {
+            $memberNumber = str_pad(((int) $lastMember->member_number) + 1, 4, '0', STR_PAD_LEFT);
+        } else {
+            $memberNumber = '0001';
+        }
+
         $validated = $request->validate([
-            'member_number' => 'required|string|max:50|unique:members,member_number',
             'full_name'     => 'required|string|max:255',
             'email'         => 'required|email|unique:members,email',
             'phone'         => 'required|string|max:20',
             'organization'  => 'nullable|string|max:255',
             'status'        => 'required|in:Active,Inactive',
         ], [
-            'member_number.required' => 'Member Number is required.',
-            'member_number.unique'   => 'This Member Number already exists.',
-            'full_name.required'     => 'Full Name is required.',
-            'email.required'         => 'Email Address is required.',
-            'email.email'            => 'Please enter a valid email address.',
-            'email.unique'           => 'This email is already registered.',
-            'phone.required'         => 'Phone Number is required.',
-            'status.required'        => 'Please select a status.',
+            'full_name.required' => 'Full Name is required.',
+            'email.required'     => 'Email Address is required.',
+            'email.email'        => 'Please enter a valid email address.',
+            'email.unique'       => 'This email is already registered.',
+            'phone.required'     => 'Phone Number is required.',
+            'status.required'    => 'Please select a status.',
         ]);
+
+        $validated['member_number'] = $memberNumber;
 
         Member::create($validated);
 
@@ -73,7 +86,7 @@ class MemberController extends Controller
     }
 
     /**
-     * Show the form for editing the member.
+     * Show the form for editing the specified member.
      */
     public function edit(Member $member)
     {
@@ -86,7 +99,6 @@ class MemberController extends Controller
     public function update(Request $request, Member $member)
     {
         $validated = $request->validate([
-            'member_number' => 'required|string|max:50|unique:members,member_number,' . $member->id,
             'full_name'     => 'required|string|max:255',
             'email'         => 'required|email|unique:members,email,' . $member->id,
             'phone'         => 'required|string|max:20',

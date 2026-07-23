@@ -1,61 +1,66 @@
 <x-app-layout>
+<x-slot name="header">
 
-    <x-slot name="header">
-        <div class="flex justify-between items-center">
+    <div class="bg-gradient-to-r from-blue-700 via-blue-600 to-indigo-700 rounded-2xl shadow-xl p-8 text-white">
+
+        <div class="flex flex-col lg:flex-row justify-between items-center">
 
             <div>
-                <h2 class="text-3xl font-bold text-gray-800">
-                    📊 SOFSREA Reports Dashboard
-                </h2>
 
-                <p class="text-gray-500 mt-1">
-                    Society of Forensic Science and Experts Association
+                <h1 class="text-4xl font-extrabold tracking-wide">
+                    📊 SOFSREA Reporting & Analytics Center
+                </h1>
+
+                <p class="mt-3 text-blue-100 text-lg">
+                    Real-Time Membership & Certificate Management Dashboard
                 </p>
+
+                <div class="mt-6 flex flex-wrap gap-6 text-sm">
+
+                    <div>
+                        <span class="font-semibold">📅 Date</span><br>
+                        {{ now()->format('d F Y') }}
+                    </div>
+
+                    <div>
+                        <span class="font-semibold">🕒 Time</span><br>
+                        {{ now()->format('h:i A') }}
+                    </div>
+
+                    <div>
+                        <span class="font-semibold">👤 Administrator</span><br>
+                        {{ Auth::user()->name }}
+                    </div>
+
+                </div>
+
             </div>
 
-<div class="mt-8 bg-white rounded-xl shadow-lg p-6">
+            <div class="mt-8 lg:mt-0">
 
-    <h2 class="text-2xl font-bold text-gray-800 mb-4">
-        Report Summary
-    </h2>
+                <div class="bg-white/20 backdrop-blur-md rounded-xl p-6 text-center shadow-lg">
 
-    <p class="text-gray-700 leading-8">
+                    <p class="text-lg font-semibold">
+                        System Status
+                    </p>
 
-        This dashboard provides a comprehensive overview of the
-        <strong>Society of Forensic Science and Experts Association (SOFSREA)</strong>
-        certificate management system.
+                    <div class="mt-3 text-3xl">
+                        🟢
+                    </div>
 
-    </p>
+                    <p class="mt-2 text-green-200 font-bold">
+                        ONLINE
+                    </p>
 
-    <ul class="mt-4 space-y-2 text-gray-700">
+                </div>
 
-        <li>✅ Total Registered Members: <strong>{{ $memberCount }}</strong></li>
+            </div>
 
-        <li>📜 Total Certificates Issued: <strong>{{ $certificateCount }}</strong></li>
-
-        <li>🟢 Valid Certificates: <strong>{{ $validCertificates }}</strong></li>
-
-        <li>🔴 Expired Certificates: <strong>{{ $expiredCertificates }}</strong></li>
-
-        <li>⏰ Certificates Expiring Within 30 Days: <strong>{{ $expiringSoon }}</strong></li>
-
-    </ul>
-
-    <div class="mt-6 border-t pt-4 text-center text-gray-500 text-sm">
-
-        Society of Forensic Science and Experts Association (SOFSREA)
-
-        <br>
-
-        Report Generated:
-        {{ now()->format('d F Y, h:i A') }}
+        </div>
 
     </div>
 
-</div>
-
-        </div>
-    </x-slot>
+</x-slot>
 
     <div class="py-8">
 
@@ -109,26 +114,133 @@
             </div>
 
 
-            <!-- Executive Summary -->
+           <!-- Dashboard Overview -->
 
-            <h2 class="text-2xl font-bold text-gray-800 mb-5">
-                Executive Summary
-            </h2>
+<div class="mt-10">
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+    <h2 class="text-3xl font-bold text-gray-800">
+        Dashboard Overview
+    </h2>
 
-                <div class="bg-blue-600 text-white rounded-xl p-6 shadow-lg">
+    <p class="text-gray-500 mt-2 mb-8">
+        Monitor membership registration and certificate performance at a glance.
+    </p>
 
-                    <h3 class="text-lg font-semibold">
-                        Total Members
-                    </h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-6">
 
-                    <p class="text-4xl font-bold mt-4">
-                        {{ $memberCount }}
-                    </p>
+        <!-- Members -->
 
-                </div>
+        <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-6 hover:shadow-xl transition duration-300">
 
+            <div class="text-4xl mb-4">
+                👥
+            </div>
+
+            <h3 class="text-lg font-semibold text-gray-800">
+                Members
+            </h3>
+
+            <p class="text-4xl font-bold text-gray-900 mt-4">
+                {{ $memberCount }}
+            </p>
+
+            <p class="text-gray-500 mt-2">
+                Registered Members
+            </p>
+
+        </div>
+
+        <!-- Certificates -->
+
+        <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-6 hover:shadow-xl transition duration-300">
+
+            <div class="text-4xl mb-4">
+                📜
+            </div>
+
+            <h3 class="text-lg font-semibold text-gray-800">
+                Certificates
+            </h3>
+
+            <p class="text-4xl font-bold text-gray-900 mt-4">
+                {{ $certificateCount }}
+            </p>
+
+            <p class="text-gray-500 mt-2">
+                Certificates Issued
+            </p>
+
+        </div>
+
+        <!-- Valid -->
+
+        <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-6 hover:shadow-xl transition duration-300">
+
+            <div class="text-4xl mb-4">
+                ✅
+            </div>
+
+            <h3 class="text-lg font-semibold text-gray-800">
+                Valid
+            </h3>
+
+            <p class="text-4xl font-bold text-green-600 mt-4">
+                {{ $validCertificates }}
+            </p>
+
+            <p class="text-gray-500 mt-2">
+                Active Certificates
+            </p>
+
+        </div>
+
+        <!-- Expired -->
+
+        <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-6 hover:shadow-xl transition duration-300">
+
+            <div class="text-4xl mb-4">
+                ❌
+            </div>
+
+            <h3 class="text-lg font-semibold text-gray-800">
+                Expired
+            </h3>
+
+            <p class="text-4xl font-bold text-red-600 mt-4">
+                {{ $expiredCertificates }}
+            </p>
+
+            <p class="text-gray-500 mt-2">
+                Expired Certificates
+            </p>
+
+        </div>
+
+        <!-- Expiring Soon -->
+
+        <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-6 hover:shadow-xl transition duration-300">
+
+            <div class="text-4xl mb-4">
+                ⏰
+            </div>
+
+            <h3 class="text-lg font-semibold text-gray-800">
+                Expiring Soon
+            </h3>
+
+            <p class="text-4xl font-bold text-yellow-600 mt-4">
+                {{ $expiringSoon }}
+            </p>
+
+            <p class="text-gray-500 mt-2">
+                Within 30 Days
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
                 <div class="bg-green-600 text-white rounded-xl p-6 shadow-lg">
 
                     <h3 class="text-lg font-semibold">

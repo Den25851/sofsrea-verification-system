@@ -31,13 +31,23 @@ class ReportController extends Controller
             ->take(10)
             ->get();
 
+        // NEW
+        $members = Member::orderBy('member_number')->get();
+
+        // NEW
+        $certificates = Certificate::with('member')
+            ->orderBy('certificate_number')
+            ->get();
+
         return view('reports.index', compact(
             'memberCount',
             'certificateCount',
             'validCertificates',
             'expiredCertificates',
             'expiringSoon',
-            'latestCertificates'
+            'latestCertificates',
+            'members',
+            'certificates'
         ));
     }
 }
