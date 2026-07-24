@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Member;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\MemberRegistrationMail;
 
 class MemberController extends Controller
 {
@@ -69,12 +71,14 @@ class MemberController extends Controller
         ]);
 
         $validated['member_number'] = $memberNumber;
+$member = Member::create($validated);
 
-        Member::create($validated);
+// Send welcome email
+Mail::to($member->email)->send(new MemberRegistrationMail($member));
 
-        return redirect()
-            ->route('members.index')
-            ->with('success', 'Member registered successfully.');
+return redirect()
+    ->route('members.index')
+    ->with('success', 'Member registered successfully. A confirmation email has been sent.');
     }
 
     /**
