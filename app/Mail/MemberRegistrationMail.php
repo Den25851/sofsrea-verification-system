@@ -12,6 +12,7 @@ class MemberRegistrationMail extends Mailable
     use Queueable, SerializesModels;
 
     public $member;
+    public $certificate;
 
     /**
      * Create a new message instance.
@@ -19,6 +20,9 @@ class MemberRegistrationMail extends Mailable
     public function __construct(Member $member)
     {
         $this->member = $member;
+
+        // Get the newest certificate for this member
+        $this->certificate = $member->certificates()->latest()->first();
     }
 
     /**

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Certificate;
 use App\Models\Member;
+use App\Mail\CertificateIssuedMail;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 
 class CertificateController extends Controller
@@ -66,15 +68,21 @@ class CertificateController extends Controller
         // Generate Certificate Number
         $certificateNumber = 'SOFSREA-' . $year . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
 
-        Certificate::create([
-            'member_id' => $request->member_id,
-            'certificate_number' => $certificateNumber,
-            'certificate_title' => $request->certificate_title,
-            'issue_date' => $request->issue_date,
-            'expiry_date' => $request->expiry_date,
-            'status' => $request->status,
-        ]);
+      $certificate = Certificate::create([
+    'member_id' => $request->member_id,
+    'certificate_number' => $certificateNumber,
+    'certificate_title' => $request->certificate_title,
+    'issue_date' => $request->issue_date,
+    'expiry_date' => $request->expiry_date,
+    'status' => $request->status,
+]);
 
+// Load the related member
+$certificate->load('member');
+
+// Send certificate issued email
+Mail::to($certificate->member->email)
+    ->send(new CertificateIssuedMail($certificate));
         return redirect()
             ->route('certificates.index')
             ->with('success', 'Certificate issued successfully.');
