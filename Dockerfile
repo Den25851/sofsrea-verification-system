@@ -1,15 +1,18 @@
 FROM php:8.3-cli
 
-# Install system dependencies
+# Install system dependencies + Node.js
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
     zip \
+    curl \
     libzip-dev \
     libpq-dev \
     libpng-dev \
     libjpeg62-turbo-dev \
     libfreetype6-dev \
+    && curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install \
         gd \
@@ -28,24 +31,27 @@ WORKDIR /var/www/html
 
 # Copy project
 COPY . .
-RUN mkdir -p storage/framework/cache
-RUN mkdir -p storage/framework/views
-RUN mkdir -p storage/framework/sessions
-RUN mkdir -p storage/logs
-RUN chmod -R 775 storage bootstrap/cache
-# Install Laravel dependencies
+
+# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
-RUN mkdir -p storage/framework/cache
-RUN mkdir -p storage/framework/views
-RUN mkdir -p storage/framework/sessions
-RUN mkdir -p storage/logs
+
+# Install frontend dependencies and build Vite assets
+RUN npm install
+RUN npm run build
+
+# Create Laravel storage folders
+RUN mkdir -p storage/framework/cache \
+    storage/framework/views \
+    storage/framework/sessions \
+    storage/logs
+
 RUN chmod -R 775 storage bootstrap/cache
-# Optimize Laravel
+
+# Clear caches
 RUN php artisan config:clear || true
 RUN php artisan route:clear || true
 RUN php artisan view:clear || true
 
-# Expose Render port
 EXPOSE 10000
 
 CMD php artisan serve --host=0.0.0.0 --port=${PORT:-10000}
