@@ -28,10 +28,18 @@ WORKDIR /var/www/html
 
 # Copy project
 COPY . .
-
+RUN mkdir -p storage/framework/cache
+RUN mkdir -p storage/framework/views
+RUN mkdir -p storage/framework/sessions
+RUN mkdir -p storage/logs
+RUN chmod -R 775 storage bootstrap/cache
 # Install Laravel dependencies
 RUN composer install --no-dev --optimize-autoloader
-
+RUN mkdir -p storage/framework/cache
+RUN mkdir -p storage/framework/views
+RUN mkdir -p storage/framework/sessions
+RUN mkdir -p storage/logs
+RUN chmod -R 775 storage bootstrap/cache
 # Optimize Laravel
 RUN php artisan config:clear || true
 RUN php artisan route:clear || true
