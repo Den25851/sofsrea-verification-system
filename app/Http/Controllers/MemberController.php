@@ -73,12 +73,18 @@ class MemberController extends Controller
         $validated['member_number'] = $memberNumber;
 $member = Member::create($validated);
 
-// Send welcome email
-Mail::to($member->email)->send(new MemberRegistrationMail($member));
+try {
+    Mail::to($member->email)->send(new MemberRegistrationMail($member));
+    $message = 'Member registered successfully. A confirmation email has been sent.';
+} catch (\Exception $e) {
+    \Log::error('Member email failed: '.$e->getMessage());
+
+    $message = 'Member registered successfully, but the confirmation email could not be sent.';
+}
 
 return redirect()
     ->route('members.index')
-    ->with('success', 'Member registered successfully. A confirmation email has been sent.');
+    ->with('success', $message);
     }
 
     /**
